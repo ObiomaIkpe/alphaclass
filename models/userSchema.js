@@ -1,6 +1,6 @@
-//this will be a child of user model
-
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt')
+
 
 // const User = require('../models/userModel');
 
@@ -65,6 +65,16 @@ const userSchema = new mongoose.Schema({
   },
 
 }, {timestamps: true});
+
+
+userSchema.pre('save', async function(next) {
+
+})
+
+userSchema.methods.comparePassword = async function(candidatePassword, userPassword) 
+    {    
+    return await bcrypt.compare(candidatePassword, userPassword);
+}
 
 
 const User = mongoose.model('User', userSchema);
