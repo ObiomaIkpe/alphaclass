@@ -1,5 +1,6 @@
 const User = require('../models/userSchema');
 const bcrypt = require('bcrypt')
+const transporter =  require('../emails/email')
 const jwt = require('jsonwebtoken')
 
 const signUp = async (req, res) => {
@@ -48,6 +49,25 @@ const login = async(req, res) => {
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '24h', // Token expires in 24 hours
   });
+
+  const recipientEmail = user.email;
+
+  const mailOptions = {
+    from: process.env.MAIL_USER,
+    to: recipientEmail,
+    subject: 'Login Successful',
+    text: `Hello ${user.username}, \n \n Welcome to our CarBooking API service`,
+    html: `<p>Hello <strong>${user.lastName}</strong> </p>, <p>welcome! </p>`
+  }
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if(error){
+      console.error('error sending login email', error)
+    }
+    else{
+      console.log('Welcome email sent:', info.response);
+    }
+  })
 
   res.cookie('token', token, {
     httpOnly: true,
